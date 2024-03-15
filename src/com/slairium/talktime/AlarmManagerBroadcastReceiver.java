@@ -26,6 +26,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.media.AudioAttributes;
 import android.os.Bundle;
 import android.os.PowerManager;
 import android.os.SystemClock;
@@ -219,7 +220,34 @@ public class AlarmManagerBroadcastReceiver extends BroadcastReceiver {
 		}
 
 		MediaPlayer mp = new MediaPlayer();
-		mp.setAudioStreamType(AudioManager.STREAM_RING);
+
+		//~ mp.setAudioStreamType(AudioManager.STREAM_RING);
+
+		//~ CONTENT_TYPE_MOVIE
+		//~ CONTENT_TYPE_SONIFICATION
+		//~ CONTENT_TYPE_SPEECH
+		//~ CONTENT_TYPE_UNKNOWN
+		//~ USAGE_ALARM
+		//~ USAGE_ASSISTANCE_ACCESSIBILITY
+		//~ USAGE_ASSISTANCE_NAVIGATION_GUIDANCE
+		//~ USAGE_ASSISTANCE_SONIFICATION
+		//~ USAGE_ASSISTANT
+		//~ USAGE_GAME
+		//~ USAGE_MEDIA
+		//~ USAGE_NOTIFICATION
+		//~ USAGE_NOTIFICATION_COMMUNICATION_DELAYED
+		//~ USAGE_NOTIFICATION_COMMUNICATION_INSTANT
+		//~ USAGE_NOTIFICATION_COMMUNICATION_REQUEST
+		//~ USAGE_NOTIFICATION_EVENT
+		//~ USAGE_NOTIFICATION_RINGTONE
+		//~ USAGE_UNKNOWN
+		//~ USAGE_VOICE_COMMUNICATION
+		//~ USAGE_VOICE_COMMUNICATION_SIGNALLING
+		AudioAttributes aa1 = new AudioAttributes.Builder()
+				.setUsage(AudioAttributes.USAGE_NOTIFICATION_EVENT)
+				.setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+				.build();
+		mp.setAudioAttributes(aa1);
 
 		String sndext;
 		Random rnd = new Random();
