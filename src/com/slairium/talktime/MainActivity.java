@@ -10,7 +10,6 @@ import android.content.pm.PackageManager;
 public class MainActivity extends Activity {
 
 	private static final int REQUEST_CODE_PERMISSION_READ_EXTERNAL_STORAGE = 77;
-	private static final int REQUEST_CODE_PERMISSION_SCHEDULE_EXACT_ALARM = 78;
 
 	private AlarmManagerBroadcastReceiver alarm;
 
@@ -18,25 +17,19 @@ public class MainActivity extends Activity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		int permissionStatus = MainActivity.this.getApplicationContext().checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE);
+		int permissionStatus = MainActivity.this.getApplicationContext()
+			.checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE);
 
 		if (permissionStatus != PackageManager.PERMISSION_GRANTED) {
-			MainActivity.this.requestPermissions(new String[] {Manifest.permission.READ_EXTERNAL_STORAGE,
-				Manifest.permission.WRITE_EXTERNAL_STORAGE},
-				REQUEST_CODE_PERMISSION_READ_EXTERNAL_STORAGE);
+			MainActivity.this.requestPermissions(new String[] {
+					Manifest.permission.READ_EXTERNAL_STORAGE,
+					Manifest.permission.WRITE_EXTERNAL_STORAGE
+				}, REQUEST_CODE_PERMISSION_READ_EXTERNAL_STORAGE);
 		}
 
-		//~ permissionStatus = MainActivity.this.getApplicationContext().checkSelfPermission(Manifest.permission.SCHEDULE_EXACT_ALARM);
-
-		//~ if (permissionStatus != PackageManager.PERMISSION_GRANTED) {
-			//~ MainActivity.this.requestPermissions(new String[] {Manifest.permission.SCHEDULE_EXACT_ALARM},
-				//~ REQUEST_CODE_PERMISSION_SCHEDULE_EXACT_ALARM);
-		//~ }
-
 		alarm = new AlarmManagerBroadcastReceiver();
-
-		alarm.say_time(MainActivity.this.getApplicationContext(), MainActivity.this);
+		alarm.say_time(MainActivity.this.getApplicationContext()
+			, MainActivity.this);
 		alarm.setup_next(MainActivity.this.getApplicationContext());
-
 	}
 }

@@ -35,7 +35,6 @@ import android.widget.Toast;
 
 public class AlarmManagerBroadcastReceiver extends BroadcastReceiver {
 
-	//~ final public static String ONE_TIME = "onetime";
 	private static final int MORNING_START	= 3;
 	private static final int DAY_START		= 9;
 	private static final int EVENING_START	= 18;
@@ -44,10 +43,7 @@ public class AlarmManagerBroadcastReceiver extends BroadcastReceiver {
 
 	private static final String CRONTAB_FOLDER	= "/phonedata/";
 	private static final String FN_CRONTAB		= "crontab.txt";
-
-	//~ public static final String LOGFILENAME	= "/slairium.talktime.log";
-	//~ private static final int REQUEST_CODE_PERMISSION_READ_EXTERNAL_STORAGE = 77;
-	//~ private static final int REQUEST_CODE_PERMISSION_SCHEDULE_EXACT_ALARM = 78;
+	private static final String FN_SETTINGS		= "settings.txt";
 
 	private int SetAlarmMode = 2;
 	// 1 - setExactAndAllowWhileIdle
@@ -63,31 +59,35 @@ public class AlarmManagerBroadcastReceiver extends BroadcastReceiver {
 
 	@Override
 	public void onReceive(Context context, Intent intent) {
-		 PowerManager pm = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
-         PowerManager.WakeLock wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "YOUR TAG");
-         //Acquire the lock
-         wl.acquire();
+		PowerManager pm = (PowerManager) context.getSystemService(
+			Context.POWER_SERVICE);
+		PowerManager.WakeLock wl = pm.newWakeLock(
+			PowerManager.PARTIAL_WAKE_LOCK, "YOUR TAG");
+		//Acquire the lock
+		wl.acquire();
 
-		 say_time(context, null);
-		 setup_next(context);
+		say_time(context, null);
+		setup_next(context);
 
-         //Release the lock
-         wl.release();
+		//Release the lock
+		wl.release();
 	}
 
-    public void _setExactAndAllowWhileIdle(Context context, long start_time){
-    	AlarmManager am=(AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
-        Intent intent = new Intent(context, AlarmManagerBroadcastReceiver.class);
-        PendingIntent pi = PendingIntent.getBroadcast(context, 0, intent, 0);
-        am.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, start_time, pi);
-    }
+	public void _setExactAndAllowWhileIdle(Context context, long start_time) {
+		AlarmManager am = (AlarmManager) context.getSystemService(
+			Context.ALARM_SERVICE);
+		Intent intent = new Intent(context, AlarmManagerBroadcastReceiver.class);
+		PendingIntent pi = PendingIntent.getBroadcast(context, 0, intent, 0);
+		am.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, start_time, pi);
+	}
 
-    public void _setAlarmClock(Context context, long start_time){
-    	AlarmManager am=(AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
-        Intent intent = new Intent(context, AlarmManagerBroadcastReceiver.class);
-        PendingIntent pi = PendingIntent.getBroadcast(context, 0, intent, 0);
+	public void _setAlarmClock(Context context, long start_time){
+		AlarmManager am = (AlarmManager) context.getSystemService(
+			Context.ALARM_SERVICE);
+		Intent intent = new Intent(context, AlarmManagerBroadcastReceiver.class);
+		PendingIntent pi = PendingIntent.getBroadcast(context, 0, intent, 0);
 		am.setAlarmClock(new AlarmManager.AlarmClockInfo(start_time, pi), pi);
-    }
+	}
 
 	public void mylog(String msg) {
 		Log.d("SLAIRIUM", msg);
@@ -111,7 +111,7 @@ public class AlarmManagerBroadcastReceiver extends BroadcastReceiver {
 			mylog("Exception: " + Log.getStackTraceString(e));
 		}
 		try {
-		mp.prepare();
+			mp.prepare();
 		} catch (IllegalStateException e) {
 			mylog("Exception: " + Log.getStackTraceString(e));
 		} catch (IOException e) {
@@ -120,14 +120,16 @@ public class AlarmManagerBroadcastReceiver extends BroadcastReceiver {
 		mp.start();
 	}
 
-	public boolean find_snd(List<String> sndfiles, String sndname, String sndext) {
+	public boolean find_snd(List<String> sndfiles, String sndname
+		, String sndext) {
+
 		for (int i = 0; i < sndfiles.size(); i++) {
 			String snd = sndfiles.get(i);
 			if (snd.startsWith(sndname) && snd.endsWith(sndext)) {
 				return true;
 			}
 		}
-		mylog("Not found! sndname="+sndname+", sndext="+sndext);
+		mylog("Not found! sndname=" + sndname + ", sndext=" + sndext);
 		return false;
 	}
 
@@ -189,15 +191,7 @@ public class AlarmManagerBroadcastReceiver extends BroadcastReceiver {
 
 		File[] files;
 
-		List<String> sndfiles = new ArrayList<String>();	// filenames ogg or mp3
-
-		//~ int permissionStatus = context.checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE);
-
-		//~ if (permissionStatus != PackageManager.PERMISSION_GRANTED) {
-			//~ mact.requestPermissions(new String[] {Manifest.permission.READ_EXTERNAL_STORAGE,
-				//~ Manifest.permission.WRITE_EXTERNAL_STORAGE},
-				//~ REQUEST_CODE_PERMISSION_READ_EXTERNAL_STORAGE);
-		//~ }
+		List<String> sndfiles = new ArrayList<String>();
 
 		File file = new File(my_files_folder);
 		if (file.isDirectory()) {
@@ -216,7 +210,6 @@ public class AlarmManagerBroadcastReceiver extends BroadcastReceiver {
 			}
 		} else {
 			mylog("ERROR!!! No sound files found in '" + my_files_folder + "'!");
-			//~ finish();
 		}
 
 		MediaPlayer mp = new MediaPlayer();
@@ -244,9 +237,9 @@ public class AlarmManagerBroadcastReceiver extends BroadcastReceiver {
 		//~ USAGE_VOICE_COMMUNICATION
 		//~ USAGE_VOICE_COMMUNICATION_SIGNALLING
 		AudioAttributes aa1 = new AudioAttributes.Builder()
-				.setUsage(AudioAttributes.USAGE_NOTIFICATION_EVENT)
-				.setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
-				.build();
+			.setUsage(AudioAttributes.USAGE_NOTIFICATION_EVENT)
+			.setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+			.build();
 		mp.setAudioAttributes(aa1);
 
 		String sndext;
@@ -273,27 +266,27 @@ public class AlarmManagerBroadcastReceiver extends BroadcastReceiver {
 		}
 		play_list.clear();
 
-		mylog("Need to play : " + my_files_folder + hour_of_day_string + minute_string + ".*");
-		play_list = get_snd_startswith(sndfiles, hour_of_day_string + minute_string + ".");
+		mylog("Need to play : " + my_files_folder + hour_of_day_string
+			+ minute_string + ".*");
+		play_list = get_snd_startswith(sndfiles, hour_of_day_string
+			+ minute_string + ".");
 		if (play_list.size() > 0) {
 			mylog("Found " + play_list.size() + " items.");
 			int idx = rnd.nextInt(play_list.size());
 			String full_play_file = play_list.get(idx);
 			play_file(mp, my_files_folder + full_play_file);
 		} else {
-			mylog("Not found : " + my_files_folder + hour_of_day_string + minute_string + ".*");
+			mylog("Not found : " + my_files_folder + hour_of_day_string
+				+ minute_string + ".*");
 
-			play_list = get_snd_startswith(sndfiles, "h" + hour_of_day_string + ".");
+			play_list = get_snd_startswith(sndfiles, "h" + hour_of_day_string
+				+ ".");
 			mylog("Found " + play_list.size() + " items.");
 			int idx = rnd.nextInt(play_list.size());
 			String hour_play_file = play_list.get(idx);
 			play_file(mp, my_files_folder + hour_play_file);
-			String minute_play_file = hour_play_file.replace("h" + hour_of_day_string + ".", "m" + minute_string + ".");
-
-			//~ play_list = get_snd_startswith(sndfiles, "m" + minute_string + ".");
-			//~ mylog("Found " + play_list.size() + " items.");
-			//~ idx = rnd.nextInt(play_list.size());
-			//~ play_file = play_list.get(idx);
+			String minute_play_file = hour_play_file.replace("h"
+				+ hour_of_day_string + ".", "m" + minute_string + ".");
 			play_file(mp, my_files_folder + minute_play_file);
 		}
 		play_list.clear();
@@ -306,20 +299,13 @@ public class AlarmManagerBroadcastReceiver extends BroadcastReceiver {
 	public void setup_next(Context context) {
 		CronExpression cronExpr;
 		ZonedDateTime after;
-		ZonedDateTime min_after = ZonedDateTime.of(2012, 4, 10, 13, 0, 1, 0, zoneId);;
+		ZonedDateTime min_after = ZonedDateTime
+			.of(2012, 4, 10, 13, 0, 1, 0, zoneId);
 		long am_start;
 		long min_am_now = Long.MAX_VALUE;
 		long min_am_start = Long.MAX_VALUE;
 		ZonedDateTime now = ZonedDateTime.now();
 		long now_long = now.toInstant().toEpochMilli();
-
-		//~ int permissionStatus = context.checkSelfPermission(Manifest.permission.SCHEDULE_EXACT_ALARM);
-
-		//~ if (permissionStatus != PackageManager.PERMISSION_GRANTED) {
-			//~ mact.requestPermissions(new String[] {Manifest.permission.SCHEDULE_EXACT_ALARM},
-				//~ REQUEST_CODE_PERMISSION_SCHEDULE_EXACT_ALARM);
-		//~ }
-
 
 		File f = new File(sdcard_folder + CRONTAB_FOLDER, FN_CRONTAB);
 		if(f.exists() && !f.isDirectory()) {
@@ -344,7 +330,8 @@ public class AlarmManagerBroadcastReceiver extends BroadcastReceiver {
 								min_am_start = am_start;
 								min_after = after;
 							}
-							mylog(line + "	-	" + after + "	-	" + am_start);
+							mylog(line + "	-	" + after + "	-	"
+								+ am_start);
 						}
 					}
 					// считываем остальные строки в цикле
@@ -357,12 +344,13 @@ public class AlarmManagerBroadcastReceiver extends BroadcastReceiver {
 			}
 			//~ min_am_start = min_am_start - 14400;
 			//~ min_am_start = min_am_start - 60000;
-			mylog("setup am	-	" + min_after + "	-	" + (min_am_start-now_long)/60000);
+			mylog("setup am	-	" + min_after + "	-	"
+				+ (min_am_start - now_long) / 60000);
 			switch (SetAlarmMode)
 			{
 				 case 1:
 					mylog("Using setExactAndAllowWhileIdle.");
-		 			this._setExactAndAllowWhileIdle(context, min_am_start);
+					this._setExactAndAllowWhileIdle(context, min_am_start);
 				 break;
 
 				 case 2:
