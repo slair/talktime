@@ -1,2 +1,2 @@
 # talktime
-talktime for android
+talktime for android.
