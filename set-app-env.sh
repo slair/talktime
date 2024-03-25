@@ -18,4 +18,12 @@ export PACKAGE_PATH=com/${AUTHOR_NAMESPACE}/${APK_NAME}
 export PACKAGE=com.${AUTHOR_NAMESPACE}.${APK_NAME}
 export MAIN_CLASS=MainActivity
 
+nf="bin obj"
+for folder in ${nf}; do
+	if [ ! -d ${folder} ]; then
+		echo "Creating ${folder}"
+		mkdir ${folder}
+	fi
+done
+
 #~ env|sort
