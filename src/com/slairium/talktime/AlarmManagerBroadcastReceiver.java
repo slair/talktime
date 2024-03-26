@@ -21,6 +21,9 @@ import fc.cron.CronExpression;
 //~ import android.content.pm.PackageManager;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -51,6 +54,9 @@ public class AlarmManagerBroadcastReceiver extends BroadcastReceiver {
 
 	private static MainActivity mact;
 
+	NotificationManager nm;
+	AudioManager audioManager;
+
 	TimeZone original = TimeZone.getDefault();
 	ZoneId zoneId = TimeZone.getDefault().toZoneId();
 
@@ -61,6 +67,10 @@ public class AlarmManagerBroadcastReceiver extends BroadcastReceiver {
 	public void onReceive(Context context, Intent intent) {
 		PowerManager pm = (PowerManager) context.getSystemService(
 			Context.POWER_SERVICE);
+
+		//~ nm = (NotificationManager) context.getSystemService(
+			//~ Context.NOTIFICATION_SERVICE);
+
 		PowerManager.WakeLock wl = pm.newWakeLock(
 			PowerManager.PARTIAL_WAKE_LOCK, "YOUR TAG");
 		//Acquire the lock
@@ -144,6 +154,37 @@ public class AlarmManagerBroadcastReceiver extends BroadcastReceiver {
 		return res;
 	}
 
+	private AudioManager.OnAudioFocusChangeListener audioFocusChangeListener =
+    new AudioManager.OnAudioFocusChangeListener() {
+        @Override
+        public void onAudioFocusChange(int focusChange) {
+            switch (focusChange) {
+                case AudioManager.AUDIOFOCUS_GAIN:
+                    // Фокус предоставлен.
+                    // Например, был входящий звонок и фокус у нас отняли.
+                    // Звонок закончился, фокус выдали опять
+                    // и мы продолжили воспроизведение.
+                    //~ mediaSessionCallback.onPlay();
+                    break;
+                case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK:
+                    // Фокус отняли, потому что какому-то приложению надо
+                    // коротко "крякнуть".
+                    // Например, проиграть звук уведомления или навигатору сказать
+                    // "Через 50 метров поворот направо".
+                    // В этой ситуации нам разрешено не останавливать вопроизведение,
+                    // но надо снизить громкость.
+                    // Приложение не обязано именно снижать громкость,
+                    // можно встать на паузу, что мы здесь и делаем.
+                    //~ mediaSessionCallback.onPause();
+                    break;
+                default:
+                    // Фокус совсем отняли.
+                    //~ mediaSessionCallback.onPause();
+                    break;
+            }
+        }
+    };
+
 	public void say_time(Context context, MainActivity ma) {
 
 		if (ma != null) {
@@ -214,6 +255,51 @@ public class AlarmManagerBroadcastReceiver extends BroadcastReceiver {
 
 		MediaPlayer mp = new MediaPlayer();
 
+		nm = (NotificationManager)
+			context.getSystemService(Context.NOTIFICATION_SERVICE);
+		audioManager = (AudioManager)
+			context.getSystemService(Context.AUDIO_SERVICE);
+
+		int audioFocusResult = audioManager.requestAudioFocus(
+			audioFocusChangeListener, AudioManager.STREAM_MUSIC,
+			AudioManager.AUDIOFOCUS_GAIN_TRANSIENT);
+			//~ AudioManager.AUDIOFOCUS_GAIN);
+			//~ AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_MAY_DUCK);
+
+		mylog("audioFocusResult = " + audioFocusResult);
+		if (audioFocusResult != AudioManager.AUDIOFOCUS_REQUEST_GRANTED)
+			return;
+
+		String NOTIFICATION_CHANNEL_ID = "TT_CH";
+        NotificationChannel notificationChannel = new NotificationChannel(
+			NOTIFICATION_CHANNEL_ID, "My Notifications"
+			, NotificationManager.IMPORTANCE_DEFAULT);
+        // Configure the notification channel.
+        notificationChannel.setDescription("Channel description");
+        notificationChannel.enableLights(true);
+        //~ notificationChannel.setLightColor(Color.RED);
+        //~ notificationChannel.setVibrationPattern(new long[]{0, 1000, 500, 1000});
+        //~ notificationChannel.enableVibration(true);
+        nm.createNotificationChannel(notificationChannel);
+
+		Notification notif = new Notification.Builder(context
+			, NOTIFICATION_CHANNEL_ID)
+			.setContentTitle("ContentTitle")
+			.setContentText("ContentText")
+			.setSmallIcon(R.drawable.app_icon)
+			//~ .setLargeIcon(aBitmap)
+			.build();
+
+		//~ Notification notif = new Notification(R.drawable.app_icon
+			//~ , "Text in status bar", System.currentTimeMillis());
+		Intent intent = new Intent(mact, MainActivity.class);
+		//~ intent.putExtra(MainActivity.FILE_NAME, "somefile");
+		PendingIntent pIntent = PendingIntent.getActivity(mact, 0, intent, 0);
+		//~ notif.setLatestEventInfo(mact, "Notification's title"
+			//~ , "Notification's text", pIntent);
+		notif.flags |= Notification.FLAG_AUTO_CANCEL;
+		nm.notify(1, notif);
+
 		//~ mp.setAudioStreamType(AudioManager.STREAM_RING);
 
 		//~ CONTENT_TYPE_MOVIE
@@ -237,7 +323,7 @@ public class AlarmManagerBroadcastReceiver extends BroadcastReceiver {
 		//~ USAGE_VOICE_COMMUNICATION
 		//~ USAGE_VOICE_COMMUNICATION_SIGNALLING
 		AudioAttributes aa1 = new AudioAttributes.Builder()
-			.setUsage(AudioAttributes.USAGE_NOTIFICATION_EVENT)
+			.setUsage(AudioAttributes.USAGE_ASSISTANCE_NAVIGATION_GUIDANCE)
 			.setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
 			.build();
 		mp.setAudioAttributes(aa1);
@@ -294,6 +380,7 @@ public class AlarmManagerBroadcastReceiver extends BroadcastReceiver {
 		while (mp.isPlaying()) {
 			SystemClock.sleep(100);
 		}
+		audioManager.abandonAudioFocus(audioFocusChangeListener);
 	}
 
 	public void setup_next(Context context) {
