@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.slairium.talktime">
-	<uses-sdk android:targetSdkVersion="23" />
+	<uses-sdk android:targetSdkVersion="30" />
 	<uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 	<uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
 	<uses-permission android:name="android.permission.WAKE_LOCK" />

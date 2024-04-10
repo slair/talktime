@@ -48,6 +48,7 @@ public class AlarmManagerBroadcastReceiver extends BroadcastReceiver {
 	private static final String FN_CRONTAB		= "crontab.txt";
 	private static final String FN_SETTINGS		= "settings.txt";
 
+	private boolean use_NOTIFY = false;
 	private int SetAlarmMode = 2;
 	// 1 - setExactAndAllowWhileIdle
 	// 2 - setAlarmClock
@@ -270,35 +271,41 @@ public class AlarmManagerBroadcastReceiver extends BroadcastReceiver {
 		if (audioFocusResult != AudioManager.AUDIOFOCUS_REQUEST_GRANTED)
 			return;
 
-		String NOTIFICATION_CHANNEL_ID = "TT_CH";
-        NotificationChannel notificationChannel = new NotificationChannel(
-			NOTIFICATION_CHANNEL_ID, "My Notifications"
-			, NotificationManager.IMPORTANCE_DEFAULT);
-        // Configure the notification channel.
-        notificationChannel.setDescription("Channel description");
-        notificationChannel.enableLights(true);
-        //~ notificationChannel.setLightColor(Color.RED);
-        //~ notificationChannel.setVibrationPattern(new long[]{0, 1000, 500, 1000});
-        //~ notificationChannel.enableVibration(true);
-        nm.createNotificationChannel(notificationChannel);
+		mylog("use_NOTIFY = " + use_NOTIFY);
+		if (use_NOTIFY) {
+			mylog("CREATING NOTIFICATION");
+			String NOTIFICATION_CHANNEL_ID = "TT_CH";
+			NotificationChannel notificationChannel = new NotificationChannel(
+				NOTIFICATION_CHANNEL_ID, "My Notifications"
+				, NotificationManager.IMPORTANCE_DEFAULT);
+			// Configure the notification channel.
+			notificationChannel.setDescription("Channel description");
+			notificationChannel.enableLights(true);
+			//~ notificationChannel.setLightColor(Color.RED);
+			//~ notificationChannel.setVibrationPattern(
+				//~ new long[]{0, 1000, 500, 1000});
+			//~ notificationChannel.enableVibration(true);
+			nm.createNotificationChannel(notificationChannel);
 
-		Notification notif = new Notification.Builder(context
-			, NOTIFICATION_CHANNEL_ID)
-			.setContentTitle("ContentTitle")
-			.setContentText("ContentText")
-			.setSmallIcon(R.drawable.app_icon)
-			//~ .setLargeIcon(aBitmap)
-			.build();
+			Notification notif = new Notification.Builder(context
+				, NOTIFICATION_CHANNEL_ID)
+				.setContentTitle("ContentTitle")
+				.setContentText("ContentText")
+				.setSmallIcon(R.drawable.app_icon)
+				//~ .setLargeIcon(aBitmap)
+				.build();
 
-		//~ Notification notif = new Notification(R.drawable.app_icon
-			//~ , "Text in status bar", System.currentTimeMillis());
-		Intent intent = new Intent(mact, MainActivity.class);
-		//~ intent.putExtra(MainActivity.FILE_NAME, "somefile");
-		PendingIntent pIntent = PendingIntent.getActivity(mact, 0, intent, 0);
-		//~ notif.setLatestEventInfo(mact, "Notification's title"
-			//~ , "Notification's text", pIntent);
-		notif.flags |= Notification.FLAG_AUTO_CANCEL;
-		nm.notify(1, notif);
+			//~ Notification notif = new Notification(R.drawable.app_icon
+				//~ , "Text in status bar", System.currentTimeMillis());
+			Intent intent = new Intent(mact, MainActivity.class);
+			//~ intent.putExtra(MainActivity.FILE_NAME, "somefile");
+			PendingIntent pIntent = PendingIntent.getActivity(mact, 0,
+				intent, 0);
+			//~ notif.setLatestEventInfo(mact, "Notification's title"
+				//~ , "Notification's text", pIntent);
+			notif.flags |= Notification.FLAG_AUTO_CANCEL;
+			nm.notify(1, notif);
+		}
 
 		//~ mp.setAudioStreamType(AudioManager.STREAM_RING);
 
